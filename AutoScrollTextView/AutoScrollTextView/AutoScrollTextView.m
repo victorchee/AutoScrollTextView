@@ -8,76 +8,87 @@
 
 #import "AutoScrollTextView.h"
 
-@interface AutoScrollTextView() <UITableViewDataSource, UITableViewDelegate>
-@property (nonatomic, strong) UITableView *tableView;
-@property (nonatomic, strong) NSMutableArray<NSString *> *showingTexts;
-@property (nonatomic, strong) NSTimer *timer;
+@interface AutoScrollTextView()
+@property (nonatomic, strong) NSMutableArray<UILabel *> *reusableLabels;
+@property (nonatomic, assign) BOOL animating;
 @end
 
 @implementation AutoScrollTextView
 
 - (void)awakeFromNib {
     [super awakeFromNib];
-    
-    self.showingTexts = [NSMutableArray array];
-    
-    self.tableView = [[UITableView alloc] initWithFrame:self.bounds style:UITableViewStylePlain];
-    self.tableView.dataSource = self;
-    self.tableView.delegate = self;
-    [self addSubview:self.tableView];
 }
 
 - (void)beginAnimation {
-    if (self.showingTexts.count == 0) {
-        self.showingTexts = [self.texts mutableCopy];
-        [self.tableView reloadData];
-    }
+    CGFloat labelHeight = 30.0;
+    CGFloat maxShowingLabels = 4.0;
+    NSTimeInterval animationDuration = 4.0;
+    self.animating = YES;
     
-    self.timer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
-        NSString *firstText = self.showingTexts.firstObject;
-        [self.showingTexts removeObjectAtIndex:0];
-        [self.tableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationTop];
-        
-        [self.showingTexts insertObject:firstText atIndex:self.showingTexts.count];
-        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.showingTexts.count-1 inSection:0]] withRowAnimation:UITableViewRowAnimationBottom];
-    }];
+    __block NSInteger index = 0;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        while (self.animating) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                UILabel *label = [self dequeueResuableCell];
+                if (!label) {
+                    label = [[UILabel alloc] init];
+                }
+                
+                label.text = [[@"  " stringByAppendingString:self.texts[index]] stringByAppendingString:@"  "];
+                label.textColor = [UIColor whiteColor];
+                label.backgroundColor = [UIColor lightGrayColor];
+                label.clipsToBounds = YES;
+                label.layer.cornerRadius = labelHeight/2;
+                label.alpha = 0;
+                [self addSubview:label];
+                
+                label.translatesAutoresizingMaskIntoConstraints = NO;
+                [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-[label]" options:0 metrics:nil views:NSDictionaryOfVariableBindings(label)]];
+                NSLayoutConstraint *bottomConstraint = [NSLayoutConstraint constraintWithItem:self attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:label attribute:NSLayoutAttributeBottom multiplier:1 constant:0];
+                [self addConstraint:bottomConstraint];
+                [self addConstraint:[NSLayoutConstraint constraintWithItem:label attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:labelHeight]];
+                [self layoutIfNeeded];
+                
+                // 滚动
+                bottomConstraint.constant = CGRectGetHeight(self.frame) - labelHeight;
+                [UIView animateKeyframesWithDuration:animationDuration delay:0 options:UIViewKeyframeAnimationOptionCalculationModeLinear animations:^{
+                    [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:0.5/maxShowingLabels animations:^{
+                        label.alpha = 1;
+                    }];
+                    [UIView addKeyframeWithRelativeStartTime:0 relativeDuration:1 animations:^{
+                        [self layoutIfNeeded];
+                    }];
+                    [UIView addKeyframeWithRelativeStartTime:(maxShowingLabels-1)/maxShowingLabels relativeDuration:1.0/maxShowingLabels animations:^{
+                        label.alpha = 0;
+                    }];
+                } completion:^(BOOL finished) {
+                    [label removeFromSuperview];
+                    [self.reusableLabels addObject:label];
+                }];
+                
+                index += 1;
+                if (index > self.texts.count - 1) {
+                    index = 0;
+                }
+            });
+            
+            
+            sleep(animationDuration * 1.0/maxShowingLabels);
+        }
+    });
 }
 
 - (void)endAnimation {
-    [self.timer invalidate];
-    self.timer = nil;
+    self.animating = NO;
 }
 
-#pragma mark <UITableViewDataSource>
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return self.showingTexts.count;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"Cell"];
-    if (!cell) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
+- (UILabel *)dequeueResuableCell {
+    if (self.reusableLabels.count) {
+        UILabel *label = self.reusableLabels.firstObject;
+        [self.reusableLabels removeObject:label];
+        return label;
     }
-    cell.textLabel.text = self.showingTexts[indexPath.row];
-    return cell;
-}
-
-#pragma mark <UITableViewDelegate>
-- (void)tableView:(UITableView *)tableView willDisplayCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    cell.alpha = 0.1;
-    [UIView animateWithDuration:.1 animations:^{
-        cell.alpha = 1;
-    }];
-}
-
-- (void)tableView:(UITableView *)tableView didEndDisplayingCell:(UITableViewCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath {
-    [UIView animateWithDuration:.1 animations:^{
-        cell.alpha = 0.1;
-    }];
+    return nil;
 }
 
 @end

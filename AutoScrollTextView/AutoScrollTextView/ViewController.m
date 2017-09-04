@@ -19,9 +19,13 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     self.autoScrollTextView.texts = @[@"静夜思", @"床前明月光", @"疑是地上霜", @"举头望明月", @"低头思故乡"];
-    [self.autoScrollTextView beginAnimation];
 }
 
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    
+    [self.autoScrollTextView beginAnimation];
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
