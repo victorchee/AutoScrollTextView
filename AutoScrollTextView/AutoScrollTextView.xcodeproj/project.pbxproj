@@ -13,6 +13,7 @@
 		1F80B9FD1F5CFE0F0046EE75 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F80B9FB1F5CFE0F0046EE75 /* Main.storyboard */; };
 		1F80B9FF1F5CFE0F0046EE75 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1F80B9FE1F5CFE0F0046EE75 /* Assets.xcassets */; };
 		1F80BA021F5CFE0F0046EE75 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1F80BA001F5CFE0F0046EE75 /* LaunchScreen.storyboard */; };
+		1F80BA0B1F5CFE380046EE75 /* AutoScrollTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1F80BA0A1F5CFE380046EE75 /* AutoScrollTextView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,8 @@
 		1F80B9FE1F5CFE0F0046EE75 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1F80BA011F5CFE0F0046EE75 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1F80BA031F5CFE0F0046EE75 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1F80BA091F5CFE380046EE75 /* AutoScrollTextView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoScrollTextView.h; sourceTree = "<group>"; };
+		1F80BA0A1F5CFE380046EE75 /* AutoScrollTextView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AutoScrollTextView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +65,8 @@
 				1F80B9F61F5CFE0F0046EE75 /* AppDelegate.m */,
 				1F80B9F81F5CFE0F0046EE75 /* ViewController.h */,
 				1F80B9F91F5CFE0F0046EE75 /* ViewController.m */,
+				1F80BA091F5CFE380046EE75 /* AutoScrollTextView.h */,
+				1F80BA0A1F5CFE380046EE75 /* AutoScrollTextView.m */,
 				1F80B9FB1F5CFE0F0046EE75 /* Main.storyboard */,
 				1F80B9FE1F5CFE0F0046EE75 /* Assets.xcassets */,
 				1F80BA001F5CFE0F0046EE75 /* LaunchScreen.storyboard */,
@@ -153,6 +158,7 @@
 				1F80B9FA1F5CFE0F0046EE75 /* ViewController.m in Sources */,
 				1F80B9F71F5CFE0F0046EE75 /* AppDelegate.m in Sources */,
 				1F80B9F41F5CFE0F0046EE75 /* main.m in Sources */,
+				1F80BA0B1F5CFE380046EE75 /* AutoScrollTextView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
